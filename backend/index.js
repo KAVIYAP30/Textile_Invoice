@@ -54,3 +54,38 @@ app.post('/signup',async(req,res)=>
     }
 })
 
+// Define schema for login
+const loginSchema = new mongoose.Schema({
+  email: {
+      type: String,
+      required: true
+  },
+  password: {
+      type: String,
+      required: true
+  }
+});
+
+// Create a model for login details
+const loginDetails = mongoose.model('loginDetails', loginSchema);
+
+// Login route
+app.post('/login', async (req, res) => {
+  try {
+      // Retrieve user with provided email
+      const user = await loginDetails.findOne({ email: req.body.email });
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+      // Compare passwords
+      const passwordMatch = await bcrypt.compare(req.body.password, user.password);
+      if (!passwordMatch) {
+          return res.status(401).json({ message: 'Invalid password' });
+      }
+      // If email and password match, respond with success message or user data
+      res.status(200).json({ message: 'Login successful', userData: user });
+  } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: 'Server error' });
+  }
+});

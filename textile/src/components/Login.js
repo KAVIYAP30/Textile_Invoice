@@ -1,39 +1,36 @@
 import React, { useState } from 'react';
-// import { AiFillGoogleCircle } from 'react-icons/ai';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Login() {
-  const [signInData,setSignInData] = useState(
-    {
-      email:'',
-      password:'',
-    }
-  )
+  const [signInData, setSignInData] = useState({
+    email: '',
+    password: '',
+  });
 
-  const handleSignInChanges=(e)=>
-  {
-    const {name,value} = e.target;
-    setSignInData({...signInData,[name]:value});
-  }
-  const handleSubmit=async(e)=>
-  {
+  const handleSignInChanges = (e) => {
+    const { name, value } = e.target;
+    setSignInData({ ...signInData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       const response = await axios.post("http://localhost:9010/signin", signInData);
-      // console.log(response.data);
-      if(response.data.message==="Email not found!" || response.data.message === "wrong credentials")
-      {
-        console.log(response.data);
+      if (response.data.message === "Email not found!" || response.data.message === "wrong credentials") {
+        toast.error(response.data.message);
+      } else {
+        toast.success("Login successful!"); // Display success message
+        // Do something when login is successful, such as redirecting to another page
       }
-      setSignInData({
-          email_verify: '',
-          password_verify: '',
-      });
-  } catch (error) {
-          console.log(error);
-          console.log("Error occurred during signing in!");
-  }
-  }
+    } catch (error) {
+      console.log(error);
+      toast.error("Error occurred during signing in!");
+    }
+  };
+
   return (
     <div className='flex items-center justify-center h-screen'>
       <div className='bg-white p-8 rounded-lg shadow-lg'>
@@ -75,7 +72,7 @@ function Login() {
           </div>
         </form>
         <div className='mt-4 flex items-center justify-center'>
-          <span className='text-gray-600'>Need  an account? </span>
+          <span className='text-gray-600'>Need an account? </span>
           <Link to="/Signup" className='text-purple-600 font-semibold underline'>SignUp</Link>
         </div>
         <div className='mt-6 flex items-center justify-center'>
@@ -83,6 +80,7 @@ function Login() {
           {/* <AiFillGoogleCircle className='text-red-600 cursor-pointer' /> */}
         </div>
       </div>
+      <ToastContainer /> {/* Place ToastContainer outside of the main content */}
     </div>
   );
 }
